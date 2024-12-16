@@ -87,14 +87,8 @@ def depthFirstSearch(problem: SearchProblem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
+    # use a stack as the main data structure to ensure LIFO order needed for DFS
     from util import Stack
-    
-
-    from game import Directions
-    s = Directions.SOUTH
-    w = Directions.WEST
-    n = Directions.NORTH
-    e = Directions.EAST
     
     stack = Stack() 
     state = problem.getStartState()
@@ -102,11 +96,10 @@ def depthFirstSearch(problem: SearchProblem):
     
     tempList  = []
     visitedStates = set()
-    
+    # iterate over the stack, pushing successors onto the stack if the current state is not the goal state
     while not stack.isEmpty():
         currentStateTuple = stack.pop()
-        currentState = currentStateTuple[0]
-        currentList = currentStateTuple[1]
+        currentState, currentList = currentStateTuple
         
         if problem.isGoalState(currentState):
             return currentList
@@ -128,18 +121,19 @@ def breadthFirstSearch(problem: SearchProblem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
     from util import Queue
-    
+    # use queue as main data structure to implement FIFO order needed for BFS
     queue = Queue()
     state = problem.getStartState()
     queue.push((state, []))
     
     tempList = []
     visitedStates = set()
+    
+    # iterate over the queue, queueing successors into the queue if the current state is not the goal state
     while not queue.isEmpty():
         currentStateTuple = queue.pop()
-        currentState = currentStateTuple[0]
-        currentList = currentStateTuple[1]
-        
+                
+        currentState, currentList = currentStateTuple
         if problem.isGoalState(currentState):
             return currentList
         
@@ -151,7 +145,7 @@ def breadthFirstSearch(problem: SearchProblem):
             for tempState in tempList:
                 if tempState[0] not in visitedStates:
                     queue.push((tempState[0], currentList + [tempState[1]]))
-            
+    # return empty list if it fails
     return []
 
 def uniformCostSearch(problem: SearchProblem):
@@ -168,8 +162,30 @@ def nullHeuristic(state, problem=None):
 
 def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    from util import PriorityQueue
+    # PriorityQueue gebruikt om de node met de laagste f(n) te selecteren
+    frontier = PriorityQueue()
+    start_state = problem.getStartState()
+    frontier.push((start_state, [], 0), 0)  # (state, actions, cost)
+
+    explored = set()
+
+    while not frontier.isEmpty():
+        current_state, actions, current_cost = frontier.pop()
+
+        if problem.isGoalState(current_state):
+            return actions
+
+        if current_state not in explored:
+            explored.add(current_state)
+
+            for successor, action, step_cost in problem.getSuccessors(current_state):
+                if successor not in explored:
+                    new_cost = current_cost + step_cost
+                    f_cost = new_cost + heuristic(successor, problem)
+                    frontier.push((successor, actions + [action], new_cost), f_cost)
+
+    return []
 
 
 # Abbreviations
