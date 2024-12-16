@@ -307,6 +307,8 @@ class CornersProblem(search.SearchProblem):
         """
         "*** YOUR CODE HERE ***"
         
+        # checks whether the visited corners equal the amount of corners in the maze
+        
         _, visitedCorners = state
         return len(visitedCorners) == len(self.corners)
 
@@ -335,6 +337,11 @@ class CornersProblem(search.SearchProblem):
             x,y = currentPosition
             dx, dy = Actions.directionToVector(action)
             nextx, nexty = int(x + dx), int(y + dy)
+            
+            # check whether or not nextPosition is a corner or not 
+            # the -not in visitedCorners- ensures that there will be no double corners inside of visitedCorners
+            # as this could mess with the goal state
+            
             if not self.walls[nextx][nexty]:
                 nextPosition = (nextx, nexty)
                 if nextPosition in self.corners and nextPosition not in visitedCorners:
